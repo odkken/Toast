@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SFML.System;
 
 namespace Toast
 {
@@ -8,5 +9,7 @@ namespace Toast
         float FrameRemainder { get; }
 
         List<GameObjectBase> GameObjects { get; }
+        Vector2f MousePosition { get; }
+        void LogText(string s);
     }
 }

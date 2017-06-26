@@ -32,6 +32,10 @@ namespace Toast
             }
             Velocity = Velocity.Normalize() * Speed;
             Position += Velocity * Environment.FrameDelta;
+
+
+            Orientation = Environment.MousePosition - Position;
+            //Environment.LogText($"orientation: {Orientation.X}, {Orientation.Y}");
         }
     }
 }

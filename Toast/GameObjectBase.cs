@@ -1,4 +1,5 @@
-﻿using SFML.Graphics;
+﻿using System;
+using SFML.Graphics;
 using SFML.System;
 
 namespace Toast
@@ -9,9 +10,12 @@ namespace Toast
         private readonly Renderer _renderer;
         public Vector2f Position;
         protected Vector2f Velocity;
+
+        public Vector2f Orientation;
         protected GameObjectBase(Shape shape, IEnvironment environment)
         {
-            _renderer = new Renderer(environment, shape, () => Velocity, () => Position, () => 0f);
+            shape.Origin = shape.Size() / 2;
+            _renderer = new Renderer(environment, shape, () => Velocity, () => Position, () =>Orientation.Rotation());
             Environment = environment;
         }
 

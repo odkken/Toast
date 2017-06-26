@@ -12,7 +12,7 @@ namespace Toast
         private static RenderWindow _window;
         public static void Main(string[] args)
         {
-            _window = new RenderWindow(new VideoMode(800, 600), "SFML window");
+            _window = new RenderWindow(new VideoMode(800, 600), "SFML window", Styles.Default, new ContextSettings { AntialiasingLevel = 32 });
             //_window.SetVerticalSyncEnabled(true);
             _window.SetFramerateLimit(60);
 
@@ -25,14 +25,14 @@ namespace Toast
                 if (eventArgs.Code == Keyboard.Key.Escape)
                     _window.Close();
             };
-            var env = new SimpleEnvironment();
+            var env = new SimpleEnvironment(_window);
             var objects = new List<GameObjectBase>
             {
                 new Player(new RectangleShape(new Vector2f(50f, 50f)), env){Position = new Vector2f(screenCenter.X, screenCenter.Y)},
                 new Enemy(env)
             };
             env.GameObjects = objects;
-            
+
             var font = new Font(@"c:\windows\fonts\ariblk.ttf");
             var watch = new Stopwatch();
             watch.Start();
@@ -42,6 +42,7 @@ namespace Toast
             var text = new Text("", font);
             while (_window.IsOpen)
             {
+                env.DebugText.Clear();
                 var time = (float)watch.Elapsed.TotalSeconds;
                 var dt = time - previous;
                 previous = time;
@@ -52,7 +53,7 @@ namespace Toast
 
                 while (lag > env.FrameDelta)
                 {
-                    objects.ForEach(a=> a.Update());
+                    objects.ForEach(a => a.Update());
                     lag -= env.FrameDelta;
                 }
                 env.FrameRemainder = lag;
@@ -62,7 +63,7 @@ namespace Toast
                 //{
                 //    fpsBuffer.Dequeue();
                 //}
-                //_window.Draw(new Text($"fps: {fpsBuffer.Average() :F1}\nmin: {fpsBuffer.Min():F1}\nmax: {fpsBuffer.Max():F1}", font));
+                _window.Draw(new Text(string.Join("\n", env.DebugText), font));
                 _window.Display();
             }
         }
