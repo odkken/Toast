@@ -26,6 +26,6 @@ namespace Toast
             Position += Velocity * Environment.FrameDelta;
         }
 
-        public float Speed => 25.0f;
+        public float Speed => 55.0f;
     }
 }

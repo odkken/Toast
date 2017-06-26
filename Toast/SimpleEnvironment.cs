@@ -14,7 +14,7 @@ namespace Toast
             _window = window;
         }
 
-        public float FrameDelta => 0.02f;
+        public float FrameDelta => 0.01f;
         public float FrameRemainder { get; set; }
         public List<GameObjectBase> GameObjects { get; set; }
         public Queue<string> DebugText { get; set; } = new Queue<string>();

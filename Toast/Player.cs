@@ -9,7 +9,7 @@ namespace Toast
     public class Player : GameObjectBase
     {
         private readonly Dictionary<Keyboard.Key, Action> _keyBindings;
-        private const float Speed = 90;
+        private const float Speed = 190;
 
         public Player(Shape visual, IEnvironment env) : base(visual, env)
         {

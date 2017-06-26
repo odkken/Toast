@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
@@ -12,9 +13,9 @@ namespace Toast
         private static RenderWindow _window;
         public static void Main(string[] args)
         {
-            _window = new RenderWindow(new VideoMode(800, 600), "SFML window", Styles.Default, new ContextSettings { AntialiasingLevel = 32 });
-            //_window.SetVerticalSyncEnabled(true);
-            _window.SetFramerateLimit(60);
+            _window = new RenderWindow(new VideoMode(), "Toast", Styles.Fullscreen, new ContextSettings { AntialiasingLevel = 8});
+            _window.SetVerticalSyncEnabled(true);
+            //_window.SetFramerateLimit(60);
 
             var screenCenter = _window.Size / 2;
 
@@ -32,14 +33,18 @@ namespace Toast
                 new Enemy(env)
             };
             env.GameObjects = objects;
-
+            var showFps = false;
+            _window.KeyPressed += (sender, eventArgs) =>
+            {
+                if (eventArgs.Code == Keyboard.Key.Tilde)
+                    showFps = !showFps;
+            };
             var font = new Font(@"c:\windows\fonts\ariblk.ttf");
             var watch = new Stopwatch();
             watch.Start();
             var previous = (float)watch.Elapsed.TotalSeconds;
             var lag = 0f;
             var fpsBuffer = new Queue<float>();
-            var text = new Text("", font);
             while (_window.IsOpen)
             {
                 env.DebugText.Clear();
@@ -58,11 +63,15 @@ namespace Toast
                 }
                 env.FrameRemainder = lag;
                 objects.ForEach(_window.Draw);
-                //fpsBuffer.Enqueue(1 / dt);
-                //while (fpsBuffer.Count > 100)
-                //{
-                //    fpsBuffer.Dequeue();
-                //}
+                if (showFps)
+                {
+                    fpsBuffer.Enqueue(1 / dt);
+                    while (fpsBuffer.Count > 10)
+                    {
+                        fpsBuffer.Dequeue();
+                    }
+                    env.LogText($"fps: {fpsBuffer.Average():F1}");
+                }
                 _window.Draw(new Text(string.Join("\n", env.DebugText), font));
                 _window.Display();
             }
