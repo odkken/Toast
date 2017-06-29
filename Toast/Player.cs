@@ -11,7 +11,7 @@ namespace Toast
         private readonly Dictionary<Keyboard.Key, Action> _keyBindings;
         private const float Speed = 190;
 
-        public Player(Shape visual, IEnvironment env) : base(visual, env)
+        public Player()
         {
             _keyBindings = new Dictionary<Keyboard.Key, Action>
             {
@@ -20,6 +20,7 @@ namespace Toast
                 {Keyboard.Key.S, () => Velocity.Y = Speed},
                 {Keyboard.Key.D, () => Velocity.X = Speed}
             };
+
         }
 
         public override void Update()
@@ -33,9 +34,17 @@ namespace Toast
             Velocity = Velocity.Normalize() * Speed;
             Position += Velocity * Environment.FrameDelta;
 
+            if (Mouse.IsButtonPressed(Mouse.Button.Left))
+            {
 
+                var p = Environment.ObjectManager.Spawn<Projectile>();
+                p.Position = Position;
+                p.Initialize(new RectangleShape(new Vector2f(5f, 5f)), Environment, Environment.ObjectManager.Destroy);
+                p.SetVelocity(Orientation.Normalize() * 500f);
+            }
             Orientation = Environment.MousePosition - Position;
             //Environment.LogText($"orientation: {Orientation.X}, {Orientation.Y}");
+
         }
     }
 }

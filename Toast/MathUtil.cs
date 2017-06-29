@@ -43,5 +43,25 @@ namespace Toast
             var bounds = s.GetLocalBounds();
             return new Vector2f(bounds.Width, bounds.Height);
         }
+
+        public static float RandomGaussian(float mean, float sigma, float maxDelta = Single.NaN)
+        {
+            var u1 = 1.0 - RNG.NextDouble(); //uniform(0,1] random doubles
+            var u2 = 1.0 - RNG.NextDouble();
+            var randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2);
+            var value = (float)(mean + sigma * randStdNormal);
+            return float.IsNaN(maxDelta) ? value : Clamp(value, mean - maxDelta, mean + maxDelta);
+        }
+
+        public static float Clamp(float value, float min, float max)
+        {
+            if (value < min)
+                return min;
+            if (value > max)
+                return max;
+            return value;
+        }
+
+        private static readonly Random RNG = new Random();
     }
 }

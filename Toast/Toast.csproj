@@ -35,6 +35,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="OpenTK">
+      <HintPath>..\extlibs\OpenTK.dll</HintPath>
+    </Reference>
     <Reference Include="sfmlnet-audio-2">
       <HintPath>..\lib\sfmlnet-audio-2.dll</HintPath>
     </Reference>
@@ -54,10 +57,13 @@
   <ItemGroup>
     <Compile Include="Enemy.cs" />
     <Compile Include="GameObjectBase.cs" />
+    <Compile Include="GameObjectManager.cs" />
     <Compile Include="IEnvironment.cs" />
+    <Compile Include="IGameObjectManager.cs" />
     <Compile Include="MathUtil.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Projectile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Renderer.cs" />
     <Compile Include="SimpleEnvironment.cs" />

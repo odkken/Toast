@@ -6,21 +6,29 @@ namespace Toast
 {
     public abstract class GameObjectBase : Drawable
     {
-        protected readonly IEnvironment Environment;
-        private readonly Renderer _renderer;
+        protected IEnvironment Environment;
+        private Action<GameObjectBase> _destroyAction;
+        private Renderer _renderer;
         public Vector2f Position;
         protected Vector2f Velocity;
 
         public Vector2f Orientation;
-        protected GameObjectBase(Shape shape, IEnvironment environment)
-        {
-            shape.Origin = shape.Size() / 2;
-            _renderer = new Renderer(environment, shape, () => Velocity, () => Position, () =>Orientation.Rotation());
-            Environment = environment;
-        }
 
+        public void Initialize(Shape shape, IEnvironment environment, Action<GameObjectBase> destroyAction)
+        {
+
+            shape.Origin = shape.Size() / 2;
+            _renderer = new Renderer(environment, shape, () => Velocity, () => Position, () => Orientation.Rotation());
+            Environment = environment;
+            _destroyAction = destroyAction;
+        }
         public virtual void Update()
         {
+        }
+
+        protected void Destroy()
+        {
+            _destroyAction(this);
         }
 
         public void Draw(RenderTarget target, RenderStates states)

@@ -7,9 +7,8 @@ namespace Toast
     {
         float FrameDelta { get; }
         float FrameRemainder { get; }
-
-        List<GameObjectBase> GameObjects { get; }
         Vector2f MousePosition { get; }
+        IGameObjectManager ObjectManager { get; }
         void LogText(string s);
     }
 }
