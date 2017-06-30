@@ -29,6 +29,6 @@ namespace Toast
             base.Update();
         }
 
-        public float Speed => 55.0f;
+        public float Speed => 155.0f;
     }
 }

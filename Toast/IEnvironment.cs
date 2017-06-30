@@ -9,6 +9,7 @@ namespace Toast
         float FrameRemainder { get; }
         Vector2f MousePosition { get; }
         IGameObjectManager ObjectManager { get; }
+        float Time { get; }
         void LogText(string s);
     }
 }

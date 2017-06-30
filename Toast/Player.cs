@@ -38,6 +38,7 @@ namespace Toast
         private const int SprintDuration = 30;
         private int _sprintTicks;
         private bool _canSprintAgain = true;
+        private float lastShotTime = 0;
         public override void Update()
         {
             
@@ -70,13 +71,18 @@ namespace Toast
 
                 Position += Velocity * Environment.FrameDelta;
 
-                if (Mouse.IsButtonPressed(Mouse.Button.Left))
+                if (Mouse.IsButtonPressed(Mouse.Button.Left) && Environment.Time - lastShotTime > 0.2)
                 {
-
-                    var p = Environment.ObjectManager.Spawn<Projectile>();
-                    p.Initialize(new CircleShape(5f) { FillColor = Color.Red, OutlineColor = Color.Yellow, OutlineThickness = 2.0f }, Environment, null);
-                    p.Position = Position;
-                    p.SetVelocity(Orientation.Normalize() * 500f);
+                    lastShotTime = Environment.Time;
+                    var normalOrient = Orientation.Normalize();
+                    for (int i = 0; i <20; i++)
+                    {
+                        var p = Environment.ObjectManager.Spawn<Projectile>();
+                        p.Initialize(new CircleShape(5f) { FillColor = Color.Red, OutlineColor = Color.Yellow, OutlineThickness = 2.0f }, Environment, null);
+                        p.Position = Position;
+                        p.SetVelocity((normalOrient + new Vector2f(MathUtil.RandomGaussian(0,.15f), MathUtil.RandomGaussian(0,.15f))) * 500f);
+                    }
+                    
                 }
                 Orientation = Environment.MousePosition - Position;
                 base.Update();

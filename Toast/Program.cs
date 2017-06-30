@@ -43,8 +43,8 @@ namespace Toast
             var p = env.ObjectManager.Spawn<Player>();
             p.Initialize(new RectangleShape(new Vector2f(50f, 50f)) { Texture = new Texture(@"media\magic.png") { Smooth = true }, Scale = new Vector2f(4f, 4f) }, env, _window);
             p.Position = new Vector2f(screenCenter.X, screenCenter.Y);
-            var numEnemies = 500;
-            for (int i = 0; i < 500; i++)
+            var numEnemies = 200;
+            for (int i = 0; i < numEnemies; i++)
             {
                 SpawnEnemy(env, new Vector2f(screenCenter.X, screenCenter.Y));
             }
