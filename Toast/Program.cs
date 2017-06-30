@@ -5,18 +5,28 @@ using System.Linq;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
+using Toast.Collision;
 
 namespace Toast
 {
     static class Program
     {
         private static RenderWindow _window;
+
+        static void SpawnEnemy(IEnvironment env, Vector2f screenCenter)
+        {
+            var e = env.ObjectManager.Spawn<Enemy>();
+            e.Initialize(new CircleShape(20f) { FillColor = Color.Cyan }, env, _window);
+            e.Position = new Vector2f(MathUtil.RandomGaussian(screenCenter.X, _window.Size.X / 5f, _window.Size.X / 2.0f), MathUtil.RandomGaussian(screenCenter.Y, _window.Size.Y / 5f, _window.Size.Y / 2.0f));
+        }
         public static void Main(string[] args)
         {
             var watch = new Stopwatch();
             watch.Start();
-            _window = new RenderWindow(new VideoMode(), "Toast", Styles.Fullscreen, new ContextSettings { AntialiasingLevel = 8 });
-            var env = new SimpleEnvironment(_window, new GameObjectManager());
+            _window = new RenderWindow(new VideoMode(), "Toast", Styles.Fullscreen, new ContextSettings { AntialiasingLevel = 2 });
+            BSP bsp = null;
+            var manager = new GameObjectManager(gob => bsp?.GetCollisions(gob.Bounds));
+            var env = new SimpleEnvironment(_window, manager);
             var windowCreate = watch.Elapsed.TotalSeconds;
             _window.SetVerticalSyncEnabled(true);
             //_window.SetFramerateLimit(60);
@@ -31,16 +41,13 @@ namespace Toast
                     _window.Close();
             };
             var p = env.ObjectManager.Spawn<Player>();
-            p.Initialize(new RectangleShape(new Vector2f(50f, 50f)) { Texture = new Texture(@"..\..\..\media\magic.png") { Smooth = true }, Scale = new Vector2f(4f, 4f) }, env, go => env.ObjectManager.Destroy(go));
+            p.Initialize(new RectangleShape(new Vector2f(50f, 50f)) { Texture = new Texture(@"media\magic.png") { Smooth = true }, Scale = new Vector2f(4f, 4f) }, env, _window);
             p.Position = new Vector2f(screenCenter.X, screenCenter.Y);
-
-            for (int i = 0; i < 1000; i++)
+            var numEnemies = 500;
+            for (int i = 0; i < 500; i++)
             {
-                var e = env.ObjectManager.Spawn<Enemy>();
-                e.Initialize(new CircleShape(20f) { FillColor = Color.Cyan }, env, gob => { });
-                e.Position = new Vector2f(MathUtil.RandomGaussian(screenCenter.X, 1000, _window.Size.X / 2.0f), MathUtil.RandomGaussian(screenCenter.Y, 490, _window.Size.Y / 2.0f));
+                SpawnEnemy(env, new Vector2f(screenCenter.X, screenCenter.Y));
             }
-
             var showFps = false;
             _window.KeyPressed += (sender, eventArgs) =>
             {
@@ -54,11 +61,6 @@ namespace Toast
             while (_window.IsOpen)
             {
                 env.DebugText.Clear();
-                //foreach (var gameObjectBase in env.ma)
-                //{
-                //    objects.Remove(gameObjectBase);
-                //}
-                //destroyed.Clear();
                 var time = (float)watch.Elapsed.TotalSeconds;
                 var dt = time - previous;
                 previous = time;
@@ -66,20 +68,35 @@ namespace Toast
 
                 _window.DispatchEvents();
                 _window.Clear();
+
+                var preUpdate = watch.Elapsed.TotalSeconds;
                 while (lag > env.FrameDelta)
                 {
                     var objects = env.ObjectManager.Objects.ToList();
+                    for (int i = 0; i < numEnemies - objects.Count(a => a is Enemy); i++)
+                    {
+                        SpawnEnemy(env, new Vector2f(screenCenter.X, screenCenter.Y));
+                    }
+                    objects = env.ObjectManager.Objects.ToList();
+                    bsp = new BSP(new HashSet<GameObjectBase>(objects), new FloatRect(0, 0, _window.Size.X, _window.Size.Y));
                     foreach (var gameObjectBase in objects)
                     {
                         gameObjectBase.Update();
                     }
+                    manager.DestroyAll();
                     lag -= env.FrameDelta;
                 }
+                var postUpdate = watch.Elapsed.TotalSeconds;
+                env.LogText($"update %: {100 * (postUpdate - preUpdate) / dt:F1}");
                 env.FrameRemainder = lag;
 
                 foreach (var gameObjectBase in env.ObjectManager.Objects)
                 {
                     _window.Draw(gameObjectBase);
+                }
+                if (bsp != null)
+                {
+                    //_window.Draw(bsp);
                 }
                 if (showFps)
                 {

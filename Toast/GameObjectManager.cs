@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SFML.System;
 
 namespace Toast
@@ -6,8 +7,20 @@ namespace Toast
     public class GameObjectManager : IGameObjectManager
     {
         private readonly HashSet<GameObjectBase> _objects = new HashSet<GameObjectBase>();
+        private readonly HashSet<GameObjectBase> _toDestroy = new HashSet<GameObjectBase>();
 
         public IEnumerable<GameObjectBase> Objects => _objects;
+        Func<GameObjectBase, IEnumerable<GameObjectBase>> _getColliding;
+
+        public GameObjectManager(Func<GameObjectBase, IEnumerable<GameObjectBase>> getColliding)
+        {
+            _getColliding = getColliding;
+        }
+
+        public IEnumerable<GameObjectBase> GetCollidingEntities(GameObjectBase gameObject)
+        {
+            return _getColliding(gameObject);
+        }
 
         public T Spawn<T>() where T : GameObjectBase, new()
         {
@@ -16,14 +29,19 @@ namespace Toast
             return o;
         }
 
-        public T Spawn<T>(Vector2f position) where T : GameObjectBase
-        {
-            throw new System.NotImplementedException();
-        }
-
         public void Destroy(GameObjectBase gameObject)
         {
-            throw new System.NotImplementedException();
+            _toDestroy.Add(gameObject);
+            gameObject.IsDestroyed = true;
+        }
+
+        public void DestroyAll()
+        {
+            foreach (var go in _toDestroy)
+            {
+                _objects.Remove(go);
+            }
+            _toDestroy.Clear();
         }
     }
 }

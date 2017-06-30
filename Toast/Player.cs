@@ -11,6 +11,17 @@ namespace Toast
         private readonly Dictionary<Keyboard.Key, Action> _keyBindings;
         private const float Speed = 190;
 
+        public override void Initialize(Shape shape, IEnvironment environment, Window window)
+        {
+            base.Initialize(shape, environment, window);
+
+            window.KeyReleased += (sender, args) =>
+            {
+                if (args.Code == Keyboard.Key.Space)
+                    _canSprintAgain = true;
+            };
+        }
+
         public Player()
         {
             _keyBindings = new Dictionary<Keyboard.Key, Action>
@@ -20,30 +31,60 @@ namespace Toast
                 {Keyboard.Key.S, () => Velocity.Y = Speed},
                 {Keyboard.Key.D, () => Velocity.X = Speed}
             };
-
+            _sprintTicks = SprintDuration;
         }
 
+        private bool _sprinting = false;
+        private const int SprintDuration = 30;
+        private int _sprintTicks;
+        private bool _canSprintAgain = true;
         public override void Update()
         {
-            Velocity = new Vector2f();
-            foreach (var keyBinding in _keyBindings)
+            
+            if (_sprinting && _sprintTicks > 0)
             {
-                if (Keyboard.IsKeyPressed(keyBinding.Key))
-                    keyBinding.Value();
+                _sprintTicks--;
+                Position += Velocity * Environment.FrameDelta;
             }
-            Velocity = Velocity.Normalize() * Speed;
-            Position += Velocity * Environment.FrameDelta;
-
-            if (Mouse.IsButtonPressed(Mouse.Button.Left))
+            else
             {
 
-                var p = Environment.ObjectManager.Spawn<Projectile>();
-                p.Position = Position;
-                p.Initialize(new RectangleShape(new Vector2f(5f, 5f)), Environment, Environment.ObjectManager.Destroy);
-                p.SetVelocity(Orientation.Normalize() * 500f);
+                Velocity = new Vector2f();
+                foreach (var keyBinding in _keyBindings)
+                {
+                    if (Keyboard.IsKeyPressed(keyBinding.Key))
+                        keyBinding.Value();
+                }
+                Velocity = Velocity.Normalize() * Speed;
+                if (Keyboard.IsKeyPressed(Keyboard.Key.Space) && _canSprintAgain)
+                {
+
+                    _sprinting = true;
+                    _sprintTicks = SprintDuration;
+                    _canSprintAgain = false;
+                    Velocity = Velocity.Normalize() * Speed * 5;
+                    base.Update();
+                    return;
+                }
+
+
+                Position += Velocity * Environment.FrameDelta;
+
+                if (Mouse.IsButtonPressed(Mouse.Button.Left))
+                {
+
+                    var p = Environment.ObjectManager.Spawn<Projectile>();
+                    p.Initialize(new CircleShape(5f) { FillColor = Color.Red, OutlineColor = Color.Yellow, OutlineThickness = 2.0f }, Environment, null);
+                    p.Position = Position;
+                    p.SetVelocity(Orientation.Normalize() * 500f);
+                }
+                Orientation = Environment.MousePosition - Position;
+                base.Update();
             }
-            Orientation = Environment.MousePosition - Position;
-            //Environment.LogText($"orientation: {Orientation.X}, {Orientation.Y}");
+
+
+
+
 
         }
     }

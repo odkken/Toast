@@ -22,8 +22,11 @@ namespace Toast
                 return;
             Velocity = delta.Normalize() * Speed;
             Position += Velocity * Environment.FrameDelta;
-            if(dsm < 2000)
-                Destroy();
+
+
+
+
+            base.Update();
         }
 
         public float Speed => 55.0f;
