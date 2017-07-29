@@ -25,7 +25,7 @@ namespace Toast.Collision
             _bounds = bounds;
             var half = new Vector2f(bounds.Left + bounds.Width / 2, bounds.Top + bounds.Height / 2);
             _shape = new RectangleShape(new Vector2f(bounds.Width, bounds.Height)) { Position = new Vector2f(bounds.Left, bounds.Top), FillColor = Color.Transparent, OutlineColor = Color.White, OutlineThickness = 2f };
-            if (objects.Count < 16 || _bounds.Width < 1.0 || _bounds.Height < 1.0)
+            if (objects.Count < 4 || _bounds.Width < 1.0 || _bounds.Height < 1.0)
             {
                 _children = new BSP[2];
                 _objects = objects;

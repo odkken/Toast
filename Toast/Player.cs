@@ -75,7 +75,7 @@ namespace Toast
                 {
                     lastShotTime = Environment.Time;
                     var normalOrient = Orientation.Normalize();
-                    for (int i = 0; i <20; i++)
+                    for (int i = 0; i <40; i++)
                     {
                         var p = Environment.ObjectManager.Spawn<Projectile>();
                         p.Initialize(new CircleShape(5f) { FillColor = Color.Red, OutlineColor = Color.Yellow, OutlineThickness = 2.0f }, Environment, null);

@@ -23,13 +23,13 @@ namespace Toast
         {
             var watch = new Stopwatch();
             watch.Start();
-            _window = new RenderWindow(new VideoMode(), "Toast", Styles.Fullscreen, new ContextSettings { AntialiasingLevel = 2 });
+            _window = new RenderWindow(new VideoMode(1280,720), "Toast", Styles.Default, new ContextSettings { AntialiasingLevel = 2 });
             BSP bsp = null;
             var manager = new GameObjectManager(gob => bsp?.GetCollisions(gob.Bounds));
             var env = new SimpleEnvironment(_window, manager);
             var windowCreate = watch.Elapsed.TotalSeconds;
-            _window.SetVerticalSyncEnabled(true);
-            //_window.SetFramerateLimit(60);
+            //_window.SetVerticalSyncEnabled(true);
+            _window.SetFramerateLimit(60);
 
             var screenCenter = _window.Size / 2;
 
@@ -43,7 +43,7 @@ namespace Toast
             var p = env.ObjectManager.Spawn<Player>();
             p.Initialize(new RectangleShape(new Vector2f(50f, 50f)) { Texture = new Texture(@"media\magic.png") { Smooth = true }, Scale = new Vector2f(4f, 4f) }, env, _window);
             p.Position = new Vector2f(screenCenter.X, screenCenter.Y);
-            var numEnemies = 200;
+            var numEnemies = 400;
             for (int i = 0; i < numEnemies; i++)
             {
                 SpawnEnemy(env, new Vector2f(screenCenter.X, screenCenter.Y));
@@ -101,7 +101,7 @@ namespace Toast
                 if (showFps)
                 {
                     fpsBuffer.Enqueue(1 / dt);
-                    while (fpsBuffer.Count > 10)
+                    while (fpsBuffer.Count > 100)
                     {
                         fpsBuffer.Dequeue();
                     }
